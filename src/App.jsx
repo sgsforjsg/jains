@@ -40,7 +40,7 @@ const App = () => {
               <Route path="/verify" element={<VerifyEmail />} />
               <Route path="/data1" element={<Data1 />} />
               <Route path="/new_business" element={<NewBusiness/>}/>
-              <Route path="/deletstorage" element={<DeletStorage/>}/>
+              <Route path="/admin" element={<DeletStorage/>}/>
              {/* <Route path="/google-signin" element={<GoogleSignIn />} />
               <Route path="/oauth2/callback" element={<OAuthCallback />} />*/}
             </Routes>

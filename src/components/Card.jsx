@@ -4,12 +4,21 @@ import ImgView from './ImgView';
 import MyForm from './MyForm'; // Import the form component
 
 const Card = ({ data, language }) => {
+    console.log('data',data)
     const name = language === 'eng' ? data.title.toUpperCase() : data.gtitle;
     const owner = language === 'eng' ? data.bowner.toUpperCase() : data.gbowner;
     const genre = language === 'eng' ? data.genre.toUpperCase() : data.ggenre;
 
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
+    const documentData = {
+        featuredImage: data.featuredImage,
+        featuredImage2: data.featuredimage2,
+        featuredImage3: data.featuredimage3,
+      };
+    const documentId = 'your-document-id-here'; // Replace this with the actual document ID
+
 
     const openModal = () => {
         setShowModal(true);
@@ -58,12 +67,12 @@ const Card = ({ data, language }) => {
                                 </button>
                                 {!isEditing ? (
                                     <>
-                                        <ImgView data1={{ featuredImage: data.featuredImage }} />
+                                        <ImgView  data1={documentData} documentId={data.$id} />
                                         <div className="p-2">
-                                            <div className="font-extrabold rounded-lg text-gray-400">{data.title.toUpperCase()}</div>
-                                            <div className="rounded-lg mt-0 text-white">{data.bowner.toUpperCase()}</div>
-                                            <div className="font-medium">{data.bdetails.toUpperCase()}</div>
-                                            <div className="italic text-white">{data.baddress.toUpperCase()}</div>
+                                            <div className="font-extrabold rounded-lg text-white  ">{data.title.toUpperCase()}</div>
+                                            <div className="rounded-lg mt-0 text-gray-400">{data.bowner.toUpperCase()}</div>
+                                            <div className="font-medium text-gray-400 ">{data.bdetails.toUpperCase()}</div>
+                                            <div className="italic text-gray-400">{data.baddress.toUpperCase()}</div>
                                         </div>
                                         <button
                                             className="bg-yellow-500 text-white px-2 py-1 mt-4 rounded-md self-start"
@@ -72,6 +81,16 @@ const Card = ({ data, language }) => {
                                         >
                                             Edit
                                         </button>
+                                        <button
+                                    className="text-white font-bold uppercase text-sm self-end"
+                                    type="button"
+                                    onClick={closeModal}
+                                >
+                                    Close
+                                </button>
+
+
+
                                     </>
                                 ) : (
                                     <MyForm documentId={data.$id} initialData={data} onClose={closeModal} />

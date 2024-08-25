@@ -49,6 +49,17 @@ const Header = () => {
               >
                 साधर्मिक
               </NavLink>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  isActive ? 'text-yellow-300 font-bold' : 'hover:text-gray-300'
+                }
+              >
+                Admin
+              </NavLink>
+
+
+
               <button onClick={logout} className="hover:text-gray-300">
                 Logout
               </button>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReindexCollection from './ReindexCollection';
 
 const DeleteLocalStorageData = () => {
   const [availableData, setAvailableData] = useState([]);
@@ -42,7 +43,11 @@ const DeleteLocalStorageData = () => {
 
   return (
     <div className="p-4 bg-gray-100">
-      <h2 className="text-xl font-semibold mb-4">Delete Local Storage Data</h2>
+      <ReindexCollection/>
+      <h2 className="text-xl font-semibold mb-4">Admin Screen</h2>
+      
+     
+      <h2 className="text-xl font-semibold bg-gray-200 mb-4">Delete Local Storage Data</h2>
       {availableData.length === 0 ? (
         <p>No data available in localStorage.</p>
       ) : (
