@@ -13,9 +13,9 @@ const Card = ({ data, language }) => {
     const [isEditing, setIsEditing] = useState(false);
 
     const documentData = {
-        featuredImage: data.featuredImage,
-        featuredImage2: data.featuredimage2,
-        featuredImage3: data.featuredimage3,
+        i1: data.i1,
+        i2: data.i2,
+        i3: data.i3,
       };
     const documentId = 'your-document-id-here'; // Replace this with the actual document ID
 

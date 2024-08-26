@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { storage, databases } from '../appwriteConfig';
-import { openDB } from 'idb';
+import imageCompression from 'browser-image-compression';
 
 const ImgView = ({ data1, documentId }) => {
   const [imgUrls, setImgUrls] = useState([null, null, null]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // Track the current image index
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [fileName, setFileName] = useState(''); // State for storing file name
 
   const fileInputRefs = [useRef(null), useRef(null), useRef(null)];
-  const imageFields = ['featuredImage', 'featuredImage2', 'featuredImage3'];
+  const imageFields = ['i1', 'i2', 'i3'];
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -17,32 +18,15 @@ const ImgView = ({ data1, documentId }) => {
       setError(null);
 
       try {
-        const db = await openDB('image-store', 1, {
-          upgrade(db) {
-            db.createObjectStore('images');
-          },
-        });
-
         const newImgUrls = await Promise.all(
           imageFields.map(async (field) => {
             const imageId = data1[field];
             if (!imageId) return null;
 
-            const cachedImage = await db.get('images', imageId);
-            if (cachedImage) return cachedImage;
-
             const urlObject = await storage.getFileView('66389165001ab8078701', imageId);
-            const response = await fetch(urlObject.href);
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-
-            await db.put('images', blobUrl, imageId);
-            return blobUrl;
+            return urlObject.href;
           })
         );
-
         setImgUrls(newImgUrls);
       } catch (err) {
         setError(err.message);
@@ -62,22 +46,32 @@ const ImgView = ({ data1, documentId }) => {
     setError(null);
 
     try {
-      const response = await storage.createFile('66389165001ab8078701', file.name, file);
+      const options = {
+        maxSizeMB: 0.2,
+        maxWidthOrHeight: 800,
+      };
+      const compressedFile = await imageCompression(file, options);
+
+      // Ask the user for a custom file name
+      const customFileName = prompt('Please enter a file name', file.name);
+      if (!customFileName) {
+        setError('File name is required.');
+        setIsLoading(false);
+        return;
+      }
+
+      const compressedFileAsFile = new File([compressedFile], customFileName, {
+        type: file.type,
+      });
+
+      const response = await storage.createFile('66389165001ab8078701', compressedFileAsFile.name, compressedFileAsFile);
       const newImageId = response.$id;
 
       const urlObject = await storage.getFileView('66389165001ab8078701', newImageId);
-      const responseBlob = await fetch(urlObject.href);
-      if (!responseBlob.ok) throw new Error('Network response was not ok');
-
-      const blob = await responseBlob.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      const db = await openDB('image-store', 1);
-      await db.put('images', blobUrl, newImageId);
 
       setImgUrls((prev) => {
         const newUrls = [...prev];
-        newUrls[index] = blobUrl;
+        newUrls[index] = urlObject.href;
         return newUrls;
       });
 
@@ -137,7 +131,6 @@ const ImgView = ({ data1, documentId }) => {
           />
         </div>
 
-        {/* Navigation buttons */}
         {imgUrls.length > 1 && (
           <div className="flex justify-between mt-4">
             <button
